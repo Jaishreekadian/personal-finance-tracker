@@ -105,7 +105,7 @@ function updateChart(income, expense) {
   const data = {
     labels: ['Income', 'Expense'],
     datasets: [{
-      label: 'Finance Breakdown',
+      label: 'Finance Overview',
       data: [income, expense],
       backgroundColor: ['#2ecc71', '#e74c3c'],
       borderColor: ['#27ae60', '#c0392b'],
@@ -114,19 +114,35 @@ function updateChart(income, expense) {
   };
 
   const config = {
-    type: 'pie',
+    type: 'bar',
     data: data,
     options: {
       responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return '$' + value;
+            }
+          }
+        }
+      },
       plugins: {
         legend: {
-          position: 'bottom'
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `$${context.parsed.y}`;
+            }
+          }
         }
       }
     }
   };
 
-  // Destroy existing chart to avoid duplication
   if (financeChart) {
     financeChart.destroy();
   }
