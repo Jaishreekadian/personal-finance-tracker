@@ -1,132 +1,25 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
 
-:root {
-  --bg-color: #f9fafb;
-  --primary: #6366f1;
-  --income: #10b981;
-  --expense: #ef4444;
-  --text: #111827;
-  --light: #e5e7eb;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text);
-  padding: 30px;
+  background-color: #f9fafb;
+  color: #111827;
 }
 
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-h1, h2, h3, h4 {
-  margin-bottom: 15px;
-}
-
-.balance-box {
-  text-align: center;
-  background-color: var(--light);
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.summary-box {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.summary-box div {
-  background: var(--light);
-  padding: 10px;
-  border-radius: 8px;
-  width: 48%;
-  text-align: center;
-}
-
-.money {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.plus {
-  color: var(--income);
-}
-
-.minus {
-  color: var(--expense);
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-input {
-  padding: 10px;
-  border: 1px solid var(--light);
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-button {
-  background-color: var(--primary);
-  color: white;
-  padding: 10px;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
+input, select {
+  font-family: 'Inter', sans-serif;
 }
 
 button:hover {
-  background-color: #4f46e5;
+  background-color: #2563eb;
+  transition: 0.3s;
 }
 
-.list {
-  list-style: none;
-  margin-bottom: 20px;
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.list li {
-  padding: 10px;
-  border-radius: 6px;
-  background-color: var(--light);
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  border-left: 6px solid;
-}
-
-.list li.plus {
-  border-color: var(--income);
-}
-
-.list li.minus {
-  border-color: var(--expense);
-}
-
-.delete-btn {
-  background: transparent;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  margin-left: 10px;
-  font-size: 16px;
+.animate-fade-in {
+  animation: fade-in 0.6s ease-in-out;
 }
