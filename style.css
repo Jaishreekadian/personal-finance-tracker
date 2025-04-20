@@ -1,112 +1,132 @@
-@import url("https://fonts.googleapis.com/css?family=Lato:lato|open+sans&dispaly=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
 
-:root{
-    --box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px, 2px rgba(0,0,0,0.24);
-    --primary-color:#3498db;
-    --secondary-color:#e7e7e7;
-    --accent-color: #e74c3c;
-    --hover-color: #2980b9;
-    --income-background: #dff0d8;
-    --expanse-background: #f2dede;
-    --section-background: #f9f9f9;
-
+:root {
+  --bg-color: #f9fafb;
+  --primary: #6366f1;
+  --income: #10b981;
+  --expense: #ef4444;
+  --text: #111827;
+  --light: #e5e7eb;
 }
 
-*{
-    box-sizing:border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-    background-color: #f4f4f4;
-    font-family:"open sans", sans-serif;
-    color: #333;
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text);
+  padding: 30px;
 }
 
-
-.container{
-    max-width: 600px;
-    margin: 20px auto;
-    padding:20px;
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-h1, h2, h3, h4{
-    margin:10px 0;
-    font-weight:bold;
+h1, h2, h3, h4 {
+  margin-bottom: 15px;
 }
 
-.list li{
-    background-color: var(--section-background);
-    border-radius: 8px;
-    box-shadow: var(--box-shadow);
-    border-left: 5px solid var(--primary-color);
-    margin-bottom: 10px;
-    padding: 10px;
-    list-style-type: none;
-    transition: transform 0.3 ease;
-
+.balance-box {
+  text-align: center;
+  background-color: var(--light);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
-.list li.plus{
-    background-color: var(--income-background);
-
+.summary-box {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-.list li.minus{
-    background-color: var(--expense-background);
-    border-left-color: var(--accent-color);
-
+.summary-box div {
+  background: var(--light);
+  padding: 10px;
+  border-radius: 8px;
+  width: 48%;
+  text-align: center;
 }
 
-.list li:hover{
-    transform: scale(1.03);
+.money {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-.button, .delete-button{
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3 ease;
+.plus {
+  color: var(--income);
 }
 
-.button:hover, .delete-button:hover{
-    background-color: var(--hover-color);
+.minus {
+  color: var(--expense);
 }
 
-input[type= "text"], input[type = "number"]{
-    border: 1px solid var(--secondary-color);
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    transition: border-color 0.3 ease;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-input[type= "text"]:focus, input[type = "number"]{
-    border-color: var(--primary-color);
+input {
+  padding: 10px;
+  border: 1px solid var(--light);
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
-.inc-exp-container, .form-control, .list{
-    background-color: var(--section-background);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
+button {
+  background-color: var(--primary);
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-h4, label{
-    color: var(--primary-color);
-    font-weight: bold;
+button:hover {
+  background-color: #4f46e5;
 }
 
-@media  screen and (max-width:768px){
-    .container{
-        width: 90%;
-        padding: 10px;
-    }
-    
+.list {
+  list-style: none;
+  margin-bottom: 20px;
 }
 
+.list li {
+  padding: 10px;
+  border-radius: 6px;
+  background-color: var(--light);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  border-left: 6px solid;
+}
 
+.list li.plus {
+  border-color: var(--income);
+}
 
+.list li.minus {
+  border-color: var(--expense);
+}
 
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 16px;
+}
