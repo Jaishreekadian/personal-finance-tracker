@@ -6,38 +6,36 @@ const form = document.getElementById("form");
 const text = document.getElementById('text');
 const incomeText = document.getElementById('income-text');
 const expenseText = document.getElementById('expense-text');
-const dateInput = document.getElementById('date');
 
+let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let financeChart;
 
-const localStorageTransactions = JSON.parse(localStorage.getItem('transactions'));
-let transactions = localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
+function generateID() {
+  return Math.floor(Math.random() * 100000000);
+}
 
 function addTransaction(e) {
   e.preventDefault();
 
-  const date = dateInput.value || new Date().toISOString().split('T')[0];
+  const name = text.value;
+  const income = incomeText.value.trim() !== '' ? +incomeText.value : 0;
+  const expense = expenseText.value.trim() !== '' ? -expenseText.value : 0;
 
-  if (incomeText.value.trim() !== '') {
-    const incomeTransaction = {
-      id: generateID(),
-      text: text.value || 'Income',
-      amount: +incomeText.value,
-      date: date
-    };
-    transactions.push(incomeTransaction);
-    addTransactionDOM(incomeTransaction);
+  if (income === 0 && expense === 0) {
+    alert('Please enter a valid amount.');
+    return;
   }
 
-  if (expenseText.value.trim() !== '') {
-    const expenseTransaction = {
-      id: generateID(),
-      text: text.value || 'Expense',
-      amount: -expenseText.value,
-      date: date
-    };
-    transactions.push(expenseTransaction);
-    addTransactionDOM(expenseTransaction);
+  if (income !== 0) {
+    const transaction = { id: generateID(), text: name, amount: income };
+    transactions.push(transaction);
+    addTransactionDOM(transaction);
+  }
+
+  if (expense !== 0) {
+    const transaction = { id: generateID(), text: name, amount: expense };
+    transactions.push(transaction);
+    addTransactionDOM(transaction);
   }
 
   updateValues();
@@ -46,34 +44,27 @@ function addTransaction(e) {
   text.value = '';
   incomeText.value = '';
   expenseText.value = '';
-  dateInput.value = '';
-}
-
-function generateID() {
-  return Math.floor(Math.random() * 1000000000);
 }
 
 function addTransactionDOM(transaction) {
   const sign = transaction.amount < 0 ? '-' : '+';
-
   const item = document.createElement('li');
+
   item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
 
   item.innerHTML = `
     ${transaction.text} <span>${sign}$${Math.abs(transaction.amount)}</span>
-    <small style="display:block; color:#777;">${transaction.date}</small>
-    <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
+    <button class="delete-btn" onclick="removeTransaction(${transaction.id})">×</button>
   `;
 
   list.appendChild(item);
 }
 
 function updateValues() {
-  const amounts = transactions.map(transaction => transaction.amount);
-
-  const total = amounts.reduce((acc, item) => acc + item, 0).toFixed(2);
-  const income = amounts.filter(item => item > 0).reduce((acc, item) => acc + item, 0).toFixed(2);
-  const expense = amounts.filter(item => item < 0).reduce((acc, item) => acc + item, 0).toFixed(2);
+  const amounts = transactions.map(t => t.amount);
+  const total = amounts.reduce((acc, val) => acc + val, 0).toFixed(2);
+  const income = amounts.filter(a => a > 0).reduce((acc, val) => acc + val, 0).toFixed(2);
+  const expense = amounts.filter(a => a < 0).reduce((acc, val) => acc + val, 0).toFixed(2);
 
   balance.innerText = `$${total}`;
   money_plus.innerText = `$${income}`;
@@ -101,36 +92,26 @@ function init() {
 function updateChart(income, expense) {
   const ctx = document.getElementById('financeChart').getContext('2d');
 
-  const data = {
-    labels: ['Income', 'Expense'],
-    datasets: [{
-      label: 'Finance Breakdown',
-      data: [income, expense],
-      backgroundColor: ['#2ecc71', '#e74c3c'],
-      borderColor: ['#27ae60', '#c0392b'],
-      borderWidth: 1
-    }]
-  };
+  if (financeChart) financeChart.destroy();
 
-  const config = {
-    type: 'pie',
-    data: data,
+  financeChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Income', 'Expense'],
+      datasets: [{
+        data: [income, expense],
+        backgroundColor: ['#10b981', '#ef4444'],
+        borderColor: ['#059669', '#dc2626'],
+        borderWidth: 1
+      }]
+    },
     options: {
-      responsive: true,
       plugins: {
-        legend: {
-          position: 'bottom'
-        }
+        legend: { position: 'bottom' }
       }
     }
-  };
-
-  if (financeChart) {
-    financeChart.destroy();
-  }
-
-  financeChart = new Chart(ctx, config);
+  });
 }
 
-init();
 form.addEventListener('submit', addTransaction);
+init();
