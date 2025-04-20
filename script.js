@@ -6,14 +6,16 @@ const form = document.getElementById("form");
 const text = document.getElementById('text');
 const incomeText = document.getElementById('income-text');
 const expenseText = document.getElementById('expense-text');
+const category = document.getElementById('category');
 
 let financeChart; // Chart.js instance
 
-const localStorageTransactions = JSON.parse(
-  localStorage.getItem('transactions')
-);
-
+const localStorageTransactions = JSON.parse(localStorage.getItem('transactions'));
 let transactions = localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
+
+function generateID() {
+  return Math.floor(Math.random() * 1000000000);
+}
 
 function addTransaction(e) {
   e.preventDefault();
@@ -22,7 +24,8 @@ function addTransaction(e) {
     const incomeTransaction = {
       id: generateID(),
       text: text.value || 'Income',
-      amount: +incomeText.value
+      amount: +incomeText.value,
+      category: category.value
     };
     transactions.push(incomeTransaction);
     addTransactionDOM(incomeTransaction);
@@ -32,7 +35,8 @@ function addTransaction(e) {
     const expenseTransaction = {
       id: generateID(),
       text: text.value || 'Expense',
-      amount: -expenseText.value
+      amount: -expenseText.value,
+      category: category.value
     };
     transactions.push(expenseTransaction);
     addTransactionDOM(expenseTransaction);
@@ -44,10 +48,7 @@ function addTransaction(e) {
   text.value = '';
   incomeText.value = '';
   expenseText.value = '';
-}
-
-function generateID() {
-  return Math.floor(Math.random() * 1000000000);
+  category.value = 'General';
 }
 
 function addTransactionDOM(transaction) {
@@ -57,7 +58,8 @@ function addTransactionDOM(transaction) {
   item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
 
   item.innerHTML = `
-    ${transaction.text} <span>${sign}$${Math.abs(transaction.amount)}</span> 
+    ${transaction.text} (${transaction.category}) 
+    <span>${sign}$${Math.abs(transaction.amount)}</span> 
     <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>`;
 
   list.appendChild(item);
@@ -93,19 +95,13 @@ function updateLocalStorage() {
   localStorage.setItem('transactions', JSON.stringify(transactions));
 }
 
-function init() {
-  list.innerHTML = '';
-  transactions.forEach(addTransactionDOM);
-  updateValues();
-}
-
 function updateChart(income, expense) {
   const ctx = document.getElementById('financeChart').getContext('2d');
 
   const data = {
     labels: ['Income', 'Expense'],
     datasets: [{
-      label: 'Finance Overview',
+      label: 'Finance Breakdown',
       data: [income, expense],
       backgroundColor: ['#2ecc71', '#e74c3c'],
       borderColor: ['#27ae60', '#c0392b'],
@@ -118,36 +114,20 @@ function updateChart(income, expense) {
     data: data,
     options: {
       responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return '$' + value;
-            }
-          }
-        }
-      },
       plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `$${context.parsed.y}`;
-            }
-          }
-        }
+        legend: { display: false },
       }
     }
   };
 
-  if (financeChart) {
-    financeChart.destroy();
-  }
-
+  if (financeChart) financeChart.destroy();
   financeChart = new Chart(ctx, config);
+}
+
+function init() {
+  list.innerHTML = '';
+  transactions.forEach(addTransactionDOM);
+  updateValues();
 }
 
 init();
