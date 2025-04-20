@@ -1,117 +1,147 @@
-const balance = document.getElementById('Balance');
-const money_plus = document.getElementById('money-plus');
-const money_minus = document.getElementById('money-minus');
-const list = document.getElementById('list');
-const form = document.getElementById("form");
-const text = document.getElementById('text');
-const incomeText = document.getElementById('income-text');
-const expenseText = document.getElementById('expense-text');
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-let financeChart;
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBjj4U5kz63cdRKD4-SaXLoJAW4E6_s-cY",
+  authDomain: "personal-finance-managem-656f5.firebaseapp.com",
+  projectId: "personal-finance-managem-656f5",
+  storageBucket: "personal-finance-managem-656f5.appspot.com",
+  messagingSenderId: "14612765112",
+  appId: "1:14612765112:web:4d07aa26062fccd7bc174d",
+  measurementId: "G-9N85YFY9KL"
+};
 
-function generateID() {
-  return Math.floor(Math.random() * 100000000);
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-function addTransaction(e) {
-  e.preventDefault();
+// Elements
+const balanceEl = document.getElementById("balance");
+const amountEl = document.getElementById("amount");
+const categoryEl = document.getElementById("category");
+const dateEl = document.getElementById("date");
+const typeEl = document.getElementById("type");
+const saveBtn = document.getElementById("saveBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userEmailSpan = document.getElementById("userEmail");
+let summaryChart = null;
 
-  const name = text.value;
-  const income = incomeText.value.trim() !== '' ? +incomeText.value : 0;
-  const expense = expenseText.value.trim() !== '' ? -expenseText.value : 0;
+let currentUID = null;
 
-  if (income === 0 && expense === 0) {
-    alert('Please enter a valid amount.');
+// Auth state handling
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    currentUID = user.uid;
+    userEmailSpan.textContent = user.email;
+    loadTransactions(currentUID);
+  }
+});
+
+// Save transaction
+async function saveTransaction() {
+  const amount = parseFloat(amountEl.value);
+  const category = categoryEl.value.trim();
+  const date = dateEl.value;
+  const type = typeEl.value;
+
+  if (isNaN(amount) || !category || !date || !type) {
+    alert("Please fill all fields correctly.");
     return;
   }
 
-  if (income !== 0) {
-    const transaction = { id: generateID(), text: name, amount: income };
-    transactions.push(transaction);
-    addTransactionDOM(transaction);
-  }
+  await addDoc(collection(db, "transactions"), {
+    amount,
+    category,
+    date,
+    type,
+    uid: currentUID
+  });
 
-  if (expense !== 0) {
-    const transaction = { id: generateID(), text: name, amount: expense };
-    transactions.push(transaction);
-    addTransactionDOM(transaction);
-  }
+  amountEl.value = "";
+  categoryEl.value = "";
+  dateEl.value = "";
+  typeEl.value = "income";
 
-  updateValues();
-  updateLocalStorage();
-
-  text.value = '';
-  incomeText.value = '';
-  expenseText.value = '';
+  loadTransactions(currentUID);
 }
 
-function addTransactionDOM(transaction) {
-  const sign = transaction.amount < 0 ? '-' : '+';
-  const item = document.createElement('li');
+// Load transactions from Firestore
+async function loadTransactions(uid) {
+  const snapshot = await getDocs(collection(db, "transactions"));
+  const transactions = snapshot.docs
+    .map(doc => doc.data())
+    .filter(tx => tx.uid === uid);
 
-  item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
-
-  item.innerHTML = `
-    ${transaction.text} <span>${sign}$${Math.abs(transaction.amount)}</span>
-    <button class="delete-btn" onclick="removeTransaction(${transaction.id})">×</button>
-  `;
-
-  list.appendChild(item);
+  updateBalance(transactions);
+  drawChart(transactions);
 }
 
-function updateValues() {
-  const amounts = transactions.map(t => t.amount);
-  const total = amounts.reduce((acc, val) => acc + val, 0).toFixed(2);
-  const income = amounts.filter(a => a > 0).reduce((acc, val) => acc + val, 0).toFixed(2);
-  const expense = amounts.filter(a => a < 0).reduce((acc, val) => acc + val, 0).toFixed(2);
-
-  balance.innerText = `$${total}`;
-  money_plus.innerText = `$${income}`;
-  money_minus.innerText = `$${Math.abs(expense)}`;
-
-  updateChart(income, Math.abs(expense));
+function updateBalance(transactions) {
+  let total = 0;
+  transactions.forEach(tx => {
+    const amount = parseFloat(tx.amount);
+    const type = (tx.type || "").toLowerCase();
+    if (!isNaN(amount) && (type === "income" || type === "expense")) {
+      total += type === "income" ? amount : -amount;
+    }
+  });
+  balanceEl.textContent = `₹${total.toLocaleString()}`;
 }
 
-function removeTransaction(id) {
-  transactions = transactions.filter(transaction => transaction.id !== id);
-  updateLocalStorage();
-  init();
-}
+function drawChart(transactions) {
+  const monthly = {};
+  transactions.forEach(tx => {
+    const month = tx.date?.slice(0, 7);
+    const amount = parseFloat(tx.amount);
+    const type = (tx.type || "").toLowerCase();
+    if (!month || isNaN(amount) || !(type === "income" || type === "expense")) return;
+    if (!monthly[month]) monthly[month] = { income: 0, expense: 0 };
+    monthly[month][type] += amount;
+  });
 
-function updateLocalStorage() {
-  localStorage.setItem('transactions', JSON.stringify(transactions));
-}
+  const labels = Object.keys(monthly).sort();
+  const incomeData = labels.map(m => monthly[m].income);
+  const expenseData = labels.map(m => monthly[m].expense);
 
-function init() {
-  list.innerHTML = '';
-  transactions.forEach(addTransactionDOM);
-  updateValues();
-}
+  const ctx = document.getElementById("summaryChart").getContext("2d");
+  if (summaryChart) summaryChart.destroy();
 
-function updateChart(income, expense) {
-  const ctx = document.getElementById('financeChart').getContext('2d');
-
-  if (financeChart) financeChart.destroy();
-
-  financeChart = new Chart(ctx, {
-    type: 'doughnut',
+  summaryChart = new Chart(ctx, {
+    type: "bar",
     data: {
-      labels: ['Income', 'Expense'],
-      datasets: [{
-        data: [income, expense],
-        backgroundColor: ['#10b981', '#ef4444'],
-        borderColor: ['#059669', '#dc2626'],
-        borderWidth: 1
-      }]
+      labels,
+      datasets: [
+        { label: "Income", backgroundColor: "#4ade80", data: incomeData },
+        { label: "Expense", backgroundColor: "#f87171", data: expenseData }
+      ]
     },
     options: {
+      responsive: true,
       plugins: {
-        legend: { position: 'bottom' }
+        legend: { position: "top" },
+        title: { display: true, text: "Monthly Summary" }
       }
     }
   });
 }
 
-form.addEventListener('submit', addTransaction);
-init();
+saveBtn.addEventListener("click", saveTransaction);
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "login.html";
+  });
+}
