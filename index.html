@@ -3,60 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="x-UA-Compatible" content="ie" />
+  <title>Finance Tracker</title>
   <link rel="stylesheet" href="style.css" />
-  <title>FINANCE TRACKER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <center><h2>FINANCE TRACKER</h2></center>
-
   <div class="container">
-    <h4>Current Balance</h4>
-    <h1 id="Balance">$0.00</h1>
+    <h1>💰 Personal Finance Tracker</h1>
 
-    <div class="inc_exp-container">
+    <div class="balance-box">
+      <h3>Current Balance</h3>
+      <h2 id="Balance">$0.00</h2>
+    </div>
+
+    <div class="summary-box">
       <div>
-        <h4>Amount Credited</h4>
-        <p id="money-plus" class="money-plus">+$0.00</p>
+        <h4>Income</h4>
+        <p id="money-plus" class="money plus">+$0.00</p>
       </div>
       <div>
-        <h4>Amount Deducted</h4>
-        <p id="money-minus" class="money-minus">-$0.00</p>
+        <h4>Expenses</h4>
+        <p id="money-minus" class="money minus">-$0.00</p>
       </div>
     </div>
 
-    <h3>Add New Transaction</h3>
     <form id="form">
-      <div class="form-control">
-        <label for="text">Transaction Subject</label>
-        <input type="text" id="text" placeholder="Enter the transaction subject..." />
-      </div>
-
-      <div class="form-control">
-        <label for="income-text">Amount Credited</label>
-        <input type="number" id="income-text" placeholder="Enter the amount credited..." />
-      </div>
-
-      <div class="form-control">
-        <label for="expense-text">Amount Deducted</label>
-        <input type="number" id="expense-text" placeholder="Enter the amount deducted..." />
-      </div>
-
-      <div class="form-control">
-        <label for="date">Transaction Date</label>
-        <input type="date" id="date" />
-      </div>
-
-      <button class="button">Add Transaction</button>
+      <h3>Add Transaction</h3>
+      <input type="text" id="text" placeholder="Transaction name" required />
+      <input type="number" id="income-text" placeholder="Amount credited (optional)" />
+      <input type="number" id="expense-text" placeholder="Amount deducted (optional)" />
+      <button type="submit">Add Transaction</button>
     </form>
 
-    <h3>Transactions</h3>
+    <h3>Transaction History</h3>
     <ul id="list" class="list"></ul>
 
-    <h3>Visual Overview</h3>
-    <div style="max-width: 400px; margin: auto;">
-      <canvas id="financeChart"></canvas>
-    </div>
+    <h3>Overview</h3>
+    <canvas id="financeChart"></canvas>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
