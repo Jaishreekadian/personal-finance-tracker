@@ -3,46 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Finance Tracker</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <title>Personal Finance Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>💰 Personal Finance Tracker</h1>
+<body class="bg-gray-100 p-4">
 
-    <div class="balance-box">
-      <h3>Current Balance</h3>
-      <h2 id="Balance">$0.00</h2>
-    </div>
-
-    <div class="summary-box">
-      <div>
-        <h4>Income</h4>
-        <p id="money-plus" class="money plus">+$0.00</p>
-      </div>
-      <div>
-        <h4>Expenses</h4>
-        <p id="money-minus" class="money minus">-$0.00</p>
+  <div class="max-w-2xl mx-auto">
+    <!-- Header with Logout -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold flex items-center">
+        <span class="mr-2">💼</span> Personal Finance Tracker
+      </h1>
+      <div class="flex gap-2 items-center">
+        <span id="userEmail" class="text-sm text-gray-600"></span>
+        <button id="logoutBtn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>
       </div>
     </div>
 
-    <form id="form">
-      <h3>Add Transaction</h3>
-      <input type="text" id="text" placeholder="Transaction name" required />
-      <input type="number" id="income-text" placeholder="Amount credited (optional)" />
-      <input type="number" id="expense-text" placeholder="Amount deducted (optional)" />
-      <button type="submit">Add Transaction</button>
-    </form>
+    <!-- Current Balance -->
+    <div class="bg-white p-4 rounded-2xl shadow mb-4">
+      <h2 class="text-lg font-semibold flex items-center mb-2">
+        <span class="mr-2">💵</span> Current Balance
+      </h2>
+      <p id="balance" class="text-2xl font-bold text-green-600">₹0</p>
+    </div>
 
-    <h3>Transaction History</h3>
-    <ul id="list" class="list"></ul>
+    <!-- Add Transaction -->
+    <div class="bg-white p-4 rounded-2xl shadow mb-4">
+      <h2 class="text-lg font-semibold mb-2 flex items-center">
+        <span class="mr-2">➕</span> Add Transaction
+      </h2>
+      <input type="number" id="amount" placeholder="Amount" class="w-full p-2 mb-2 border rounded" />
+      <input type="text" id="category" placeholder="Category" class="w-full p-2 mb-2 border rounded" />
+      <input type="date" id="date" class="w-full p-2 mb-2 border rounded" />
+      <div class="flex items-center gap-2 mb-2">
+        <select id="type" class="w-full p-2 border rounded">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+      </div>
+      <button id="saveBtn" class="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600">
+        Save Transaction
+      </button>
+    </div>
 
-    <h3>Overview</h3>
-    <canvas id="financeChart"></canvas>
+    <!-- Monthly Summary Chart -->
+    <div class="bg-white p-4 rounded-2xl shadow mb-4">
+      <h2 class="text-lg font-semibold mb-2 flex items-center">
+        <span class="mr-2">📊</span> Monthly Summary
+      </h2>
+      <canvas id="summaryChart" height="200"></canvas>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
